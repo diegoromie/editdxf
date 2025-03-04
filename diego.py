@@ -1,4 +1,6 @@
 import dxfapi
+import os
+import re
 
 logoFile = "G:/Meu Drive/Datacamp/Python/finalversion/GERDAU.dxf"
 newlayers = "G:/Meu Drive/Datacamp/Python/editdxf/newlayers.xlsx"

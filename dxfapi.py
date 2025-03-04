@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 from collections import defaultdict
 from typing import Any, List
+import re
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -243,7 +244,11 @@ def export_gerdau(path: str, new_file: str) -> None:
     """
     doc = ezdxf.new()
     path = os.path.join(path, "adjusted")
-    files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
+
+    files = sorted(
+    [f for f in os.listdir(path) if f.lower().endswith(".dxf")],
+    key=lambda f: int(re.search(r"_(\d+)\.dxf$", f).group(1)) if re.search(r"_(\d+)\.dxf$", f) else float("inf")
+)
 
     paperspace_dict = {}
     # Create paperspaces
@@ -283,7 +288,7 @@ def export_gerdau(path: str, new_file: str) -> None:
 
         # Copy entities
         for entity in msp_source:
-            #logger.info(f"Copying: {entity.dxftype()}")
+            logger.info(f"Copying: {entity.dxftype()}")
             try:
                 new_entity = entity.copy()
                 psp_target.add_entity(new_entity)
