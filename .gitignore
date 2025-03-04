@@ -173,3 +173,7 @@ cython_debug/
 # Ignore virtual environment
 env/
 venv/
+
+#Ignore testfiles
+files/
+diegoscripts/

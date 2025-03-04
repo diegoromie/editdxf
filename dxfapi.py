@@ -242,6 +242,7 @@ def export_gerdau(path: str, new_file: str) -> None:
     :param new_file: Path for the output DXF file.
     """
     doc = ezdxf.new()
+    path = os.path.join(path, "adjusted")
     files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
 
     paperspace_dict = {}
@@ -256,6 +257,12 @@ def export_gerdau(path: str, new_file: str) -> None:
         msp_source = doc_source.modelspace()
         paperspace_name = f"FL{i+1}"
         psp_target = paperspace_dict[paperspace_name]
+
+        #Copy Layers
+        for layer in doc_source.layers:
+            layer_name = layer.dxf.name
+            layer_color = layer.dxf.color
+            create_layer(doc, layer_name, layer_color)
 
         # Copy linetypes
         for linetype in doc_source.linetypes:
@@ -276,7 +283,7 @@ def export_gerdau(path: str, new_file: str) -> None:
 
         # Copy entities
         for entity in msp_source:
-            logger.info(f"Copying: {entity.dxftype()}")
+            #logger.info(f"Copying: {entity.dxftype()}")
             try:
                 new_entity = entity.copy()
                 psp_target.add_entity(new_entity)
@@ -298,7 +305,8 @@ def adjust_layer(logo_file: str, new_layers: str, path: str) -> None:
     """
     files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
     df = pd.read_excel(new_layers)
-
+    new_dir = os.path.join(path,"adjusted")
+    os.makedirs(new_dir, exist_ok=True)
     for i, file in enumerate(files):
         file_path = os.path.join(path, file)
         logger.info(f"Processing: {file}")
@@ -337,5 +345,6 @@ def adjust_layer(logo_file: str, new_layers: str, path: str) -> None:
         change_logos(logo_file, doc, msp)
         remove_unused_layers(doc)
 
-        doc.save()
+        file_name = os.path.join(new_dir, file)
+        doc.saveas(file_name)
         logger.info(f"{file} processed successfully!")

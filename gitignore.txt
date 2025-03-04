@@ -170,6 +170,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Ignore virtual environment
-env/
-venv/
+# Diego Files
+files/
+diego.py
+.diego.py
