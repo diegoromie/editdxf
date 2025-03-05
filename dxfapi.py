@@ -267,7 +267,9 @@ def export_gerdau(path: str, new_file: str) -> None:
         for layer in doc_source.layers:
             layer_name = layer.dxf.name
             layer_color = layer.dxf.color
+            layer_lineweight = layer.dxf.lineweight / 10
             create_layer(doc, layer_name, layer_color)
+            change_lineweight(doc, layer_name, layer_lineweight)
 
         # Copy linetypes
         for linetype in doc_source.linetypes:
@@ -299,7 +301,7 @@ def export_gerdau(path: str, new_file: str) -> None:
     logger.info(f"Exported Gerdau DXF saved as: {new_file}")
 
 
-def adjust_layer(logo_file: str, new_layers: str, path: str) -> None:
+def adjust_layer(logo_file: str, new_layers: str, path: str, path_to_save: str) -> None:
     """
     Adjusts the layers of DXF files based on a mapping defined in an Excel file.
     This process includes exploding entities, purging blocks, updating layers, and logos.
@@ -307,11 +309,11 @@ def adjust_layer(logo_file: str, new_layers: str, path: str) -> None:
     :param logo_file: Path to the DXF file containing logos.
     :param new_layers: Path to the Excel file with layer mappings.
     :param path: Directory containing the DXF files to be processed.
+    :param path_to_save: Directory to save the adjusted DXF file.
     """
     files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
     df = pd.read_excel(new_layers)
-    new_dir = os.path.join(path,"adjusted")
-    os.makedirs(new_dir, exist_ok=True)
+    os.makedirs(path_to_save, exist_ok=True)
     for i, file in enumerate(files):
         file_path = os.path.join(path, file)
         logger.info(f"Processing: {file}")
@@ -350,6 +352,6 @@ def adjust_layer(logo_file: str, new_layers: str, path: str) -> None:
         change_logos(logo_file, doc, msp)
         remove_unused_layers(doc)
 
-        file_name = os.path.join(new_dir, file)
+        file_name = os.path.join(path_to_save, file)
         doc.saveas(file_name)
         logger.info(f"{file} processed successfully!")
