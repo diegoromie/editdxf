@@ -1,5 +1,6 @@
 import ezdxf
 import os
+import ezdxf.revcloud
 import pandas as pd
 import logging
 from collections import defaultdict
@@ -311,6 +312,8 @@ def adjust_layer(logo_file: str, new_layers: str, path: str, path_to_save: str) 
     :param path: Directory containing the DXF files to be processed.
     :param path_to_save: Directory to save the adjusted DXF file.
     """
+    arc_radius = 6.0                                                                #Raio do arco da nuvem de revisão
+    revcloud_layers = ["CT05", "CT06"]                                              #Layers onde estão as nuvens de revisão
     files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
     df = pd.read_excel(new_layers)
     os.makedirs(path_to_save, exist_ok=True)
@@ -351,7 +354,28 @@ def adjust_layer(logo_file: str, new_layers: str, path: str, path_to_save: str) 
 
         change_logos(logo_file, doc, msp)
         remove_unused_layers(doc)
+        create_revcloud(msp, revcloud_layers, arc_radius)
 
         file_name = os.path.join(path_to_save, file)
         doc.saveas(file_name)
         logger.info(f"{file} processed successfully!")
+
+def create_revcloud(msp, revcloud_layers, arc_radius):
+    all_polylines = []
+    all_layers = []
+
+    for entity in list(msp):
+        layer = entity.dxf.layer
+        if layer in revcloud_layers:
+            all_layers.append(layer)
+            if entity.dxftype() == "LWPOLYLINE":
+                if entity.is_closed:
+                    polylines_vertices = []
+                    for vertice in entity.vertices():
+                        polylines_vertices.append(vertice)
+                    all_polylines.append(polylines_vertices)
+                    msp.delete_entity(entity)
+    
+    for polyline, layer in zip(all_polylines, all_layers):
+        revcloud = ezdxf.revcloud.add_entity(msp, polyline, arc_radius)
+        revcloud.dxf.layer = layer
