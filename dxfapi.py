@@ -302,18 +302,18 @@ def export_gerdau(path: str, new_file: str) -> None:
     logger.info(f"Exported Gerdau DXF saved as: {new_file}")
 
 
-def adjust_layer(logo_file: str, new_layers: str, path: str, path_to_save: str) -> None:
+def adjust_layer(logo_file: str, new_layers: str, revcloud_layers: str, path: str, path_to_save: str) -> None:
     """
     Adjusts the layers of DXF files based on a mapping defined in an Excel file.
     This process includes exploding entities, purging blocks, updating layers, and logos.
 
     :param logo_file: Path to the DXF file containing logos.
     :param new_layers: Path to the Excel file with layer mappings.
+    :param revcloud_layers: Layers where polylines are gonna be swapped by revclouds.
     :param path: Directory containing the DXF files to be processed.
     :param path_to_save: Directory to save the adjusted DXF file.
     """
     arc_radius = 6.0                                                                #Raio do arco da nuvem de revisão
-    revcloud_layers = ["CT05", "CT06"]                                              #Layers onde estão as nuvens de revisão
     files = [f for f in os.listdir(path) if f.lower().endswith(".dxf")]
     df = pd.read_excel(new_layers)
     os.makedirs(path_to_save, exist_ok=True)
