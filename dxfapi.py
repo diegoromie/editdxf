@@ -235,7 +235,7 @@ def change_logos(filename: str, doc_target: Any, msp_target: Any) -> None:
             logger.error(f"Skipped {entity.dxftype()} due to error: {e}")
 
 
-def export_gerdau(path: str, new_file: str) -> None:
+def export_single_file(path: str, new_file: str) -> None:
     """
     Exports the DXF files from the specified directory to a new DXF file in Gerdau format.
     Each file is imported into a separate paperspace.
