@@ -237,7 +237,7 @@ def change_logos(filename: str, doc_target: Any, msp_target: Any) -> None:
 
 def export_single_file(path: str, new_file: str) -> None:
     """
-    Exports the DXF files from the specified directory to a new DXF file in Gerdau format.
+    Exports the DXF files from the specified directory to a new DXF file in a single dxf file.
     Each file is imported into a separate paperspace.
 
     :param path: Directory containing the DXF files.
@@ -299,7 +299,7 @@ def export_single_file(path: str, new_file: str) -> None:
                 logger.error(f"Skipped {entity.dxftype()} due to error: {e}")
 
     doc.saveas(new_file)
-    logger.info(f"Exported Gerdau DXF saved as: {new_file}")
+    logger.info(f"Exported single DXF saved as: {new_file}")
 
 
 def adjust_layer(logo_file: str, new_layers: str, revcloud_layers: str, path: str, path_to_save: str) -> None:
